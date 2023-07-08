@@ -102,8 +102,10 @@ func (s *server) JoinRoom(ctx context.Context, req *connect.Request[proto.JoinRo
 }
 
 func (s *server) LeaveRoom(ctx context.Context, req *connect.Request[proto.LeaveRoomRequest]) (*connect.Response[emptypb.Empty], error) {
-	st := &Stream{}
-	// TODO: st := s.getStream(req.Msg.GetRoomId(), req.Msg.GetPass())を実行する
+	st := s.getStream(req.Msg.GetRoomId(), req.Msg.GetPass())
+	if st == nil {
+		return &connect.Response[emptypb.Empty]{}, nil
+	}
 	st.close <- struct{}{}
 	close(st.close)
 	return &connect.Response[emptypb.Empty]{}, nil
