@@ -82,6 +82,15 @@ func (i *interactor) GetPass(_ context.Context) (string, error) {
 }
 
 func (i *interactor) SendMessage(ctx context.Context, roomID, text string) error {
+	message := &entity.Message{
+		RoomID: roomID,
+		Text:   text,
+	}
+
+	if err := i.messageRepository.Insert(ctx, message); err != nil {
+		return err
+	}
+
 	return nil
 }
 
