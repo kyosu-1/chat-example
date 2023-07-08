@@ -109,9 +109,12 @@ func (s *server) LeaveRoom(ctx context.Context, req *connect.Request[proto.Leave
 }
 
 func (s *server) ListMessage(ctx context.Context, req *connect.Request[proto.ListMessageRequest]) (*connect.Response[proto.ListMessageResponse], error) {
-	// TODO: s.chatInteracter.ListMessageを実行する
+	messages, err := s.chatInteractor.ListMessage(ctx, req.Msg.GetRoomId())
+	if err != nil {
+		return nil, err
+	}
 	return &connect.Response[proto.ListMessageResponse]{Msg: &proto.ListMessageResponse{
-		// TODO: Messages: toProtoMessages(messages)を返却する
+		Messages: toProtoMessages(messages),
 	}}, nil
 }
 
