@@ -95,5 +95,10 @@ func (i *interactor) SendMessage(ctx context.Context, roomID, text string) error
 }
 
 func (i *interactor) ListMessage(ctx context.Context, roomID string) ([]*entity.Message, error) {
-	return nil, nil
+	messages, err := i.messageRepository.SelectByRoomID(ctx, roomID)
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
 }
