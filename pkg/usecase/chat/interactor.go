@@ -56,7 +56,12 @@ func (i *interactor) CreateRoom(ctx context.Context, name string) (*entity.Room,
 }
 
 func (i *interactor) ListRoom(ctx context.Context) ([]*entity.Room, error) {
-	return nil, nil
+	rooms, err := i.roomRepository.SelectAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
 }
 
 func (i *interactor) GetRoom(ctx context.Context, id string) (*entity.Room, error) {
