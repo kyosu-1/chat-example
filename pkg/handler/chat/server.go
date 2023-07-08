@@ -36,9 +36,12 @@ func New(logger log.Handler, chatInteractor chat.Interactor) protoconnect.ChatSe
 }
 
 func (s *server) CreateRoom(ctx context.Context, req *connect.Request[proto.CreateRoomRequest]) (*connect.Response[proto.CreateRoomResponse], error) {
-	// TODO: s.chatInteracter.CreateRoomを実行する
+	room, err := s.chatInteractor.CreateRoom(ctx, req.Msg.GetName())
+	if err != nil {
+		return nil, err
+	}
 	return connect.NewResponse(&proto.CreateRoomResponse{
-		// TODO: Id: room.IDを返却する
+		Id: room.ID,
 	}), nil
 }
 
