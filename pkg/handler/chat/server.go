@@ -122,7 +122,10 @@ func (s *server) ListMessage(ctx context.Context, req *connect.Request[proto.Lis
 }
 
 func (s *server) Chat(ctx context.Context, req *connect.Request[proto.ChatRequest]) (*connect.Response[proto.ChatResponse], error) {
-	var room *entity.Room
+	room, err := s.chatInteractor.GetRoom(ctx, req.Msg.GetMessage().GetRoomId())
+	if err != nil {
+		return nil, err
+	}
 
 	if err := s.chatInteractor.SendMessage(ctx, req.Msg.GetMessage().GetRoomId(), req.Msg.GetMessage().GetText()); err != nil {
 		s.logger.ErrorCtx(ctx, "send message error", "err", err)
@@ -137,7 +140,14 @@ func (s *server) Chat(ctx context.Context, req *connect.Request[proto.ChatReques
 		st := st
 		_ = st
 		eg.Go(func() error {
-			// TODO: st.pbStream.Sendを実行する
+			if err := st.pbStream.Send(&proto.JoinRoomResponse{
+				Message: &proto.Message{
+					RoomId: req.Msg.GetMessage().GetRoomId(),
+					Text:   req.Msg.GetMessage().GetText(),
+				},
+			}); err != nil {
+				return err
+			}
 			return nil
 		})
 	}
@@ -147,7 +157,7 @@ func (s *server) Chat(ctx context.Context, req *connect.Request[proto.ChatReques
 	}
 
 	return connect.NewResponse(&proto.ChatResponse{
-		// TODO: Message: req.Msg.GetMessage()を返却する
+		Message: req.Msg.GetMessage(),
 	}), nil
 }
 
