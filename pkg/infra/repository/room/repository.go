@@ -21,13 +21,29 @@ func New() room.Repository {
 }
 
 func (r *repository) Insert(_ context.Context, room *entity.Room) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.mapByID[room.ID] = room
 	return nil
 }
 
 func (r *repository) Select(_ context.Context, id string) (*entity.Room, error) {
-	return nil, nil
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	room, ok := r.mapByID[id]
+	if !ok {
+		return nil, nil
+	}
+
+	return room, nil
 }
 
 func (r *repository) SelectAll(_ context.Context) ([]*entity.Room, error) {
-	return nil, nil
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	rooms := make([]*entity.Room, 0)
+	for _, room := range r.mapByID {
+		rooms = append(rooms, room)
+	}
+	return rooms, nil
 }
