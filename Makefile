@@ -26,6 +26,10 @@ evans: ## Run evans.
 .PHONY: run ## Serve api and front.
 run: run-api run-front
 
+.PHONY: down ## Stop api and front.
+down:
+	docker compose down
+
 .PHONY: run-api
 run-api: ## Serve api.
 	docker compose up api -d --build
